@@ -1,13 +1,14 @@
 import React, { useState } from "react"
 import logo from "./logo.svg"
 import "./App.css"
-import { useAsyncConstant } from "./hooks/useConstant"
+import { useAsyncConstant, useAsyncVariable } from "./hooks/useConstant"
+import { Post } from "./types/Post"
 
 function App() {
-  const { data, progress } = useAsyncConstant(() => {
+  const [post, setPost] = useAsyncVariable(() => {
     return fetch("https://jsonplaceholder.typicode.com/posts/1").then(
       response => response.json()
-    )
+    ) as Promise<Post>
   })
   return (
     <div className="App">
@@ -16,7 +17,7 @@ function App() {
         <p>
           Edit <code>src/App.js</code> and save to reload.
         </p>
-        {data ? JSON.stringify(data) : "Loading"}
+        {post.data ? JSON.stringify(post.data) : "Loading"}
         <a
           className="App-link"
           href="https://reactjs.org"
