@@ -1,8 +1,14 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react"
+import logo from "./logo.svg"
+import "./App.css"
+import { useAsyncConstant } from "./hooks/useConstant"
 
 function App() {
+  const { data, progress } = useAsyncConstant(() => {
+    return fetch("https://jsonplaceholder.typicode.com/posts/1").then(
+      response => response.json()
+    )
+  })
   return (
     <div className="App">
       <header className="App-header">
@@ -10,6 +16,7 @@ function App() {
         <p>
           Edit <code>src/App.js</code> and save to reload.
         </p>
+        {data ? JSON.stringify(data) : "Loading"}
         <a
           className="App-link"
           href="https://reactjs.org"
@@ -20,7 +27,7 @@ function App() {
         </a>
       </header>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
