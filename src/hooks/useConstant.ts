@@ -4,18 +4,27 @@ import { AsyncData, Progress } from "../types/Async"
 export function useAsyncConstant<T>(value: () => Promise<T>) {
   const [data, setData] = useState({
     data: null,
-    progress: Progress.Progressing
+    progress: "progressing"
   } as AsyncData<T | null>)
-  const [resolved, setResolved] = useState(false)
+  const [triggered, setTriggered] = useState(false)
   useEffect(() => {
-    if (!resolved)
-      value().then(data => {
-        setData({
-          data,
-          progress: Progress.Normal
-        })
-        setResolved(true)
-      })
+    if (!triggered) {
+      setTriggered(true)
+      value().then(
+        data => {
+          setData({
+            data,
+            progress: "normal"
+          })
+        },
+        rejection => {
+          setData({
+            ...data,
+            progress: new Error(rejection)
+          })
+        }
+      )
+    }
   })
   return data
 }
@@ -23,32 +32,47 @@ export function useAsyncConstant<T>(value: () => Promise<T>) {
 export function useAsyncVariable<T>(initialValue: () => Promise<T>) {
   const [data, setData] = useState({
     data: null,
-    progress: Progress.Progressing
+    progress: "progressing"
   } as AsyncData<T | null>)
-  const [resolved, setResolved] = useState(false)
-  const _val = initialValue as () => Promise<T>
+  const [triggered, setTriggered] = useState(false)
   useEffect(() => {
-    if (!resolved) {
-      _val().then(data => {
-        setData({
-          data,
-          progress: Progress.Normal
-        })
-        setResolved(true)
-      })
+    if (!triggered) {
+      setTriggered(true)
+      initialValue().then(
+        data => {
+          setData({
+            data,
+            progress: "normal"
+          })
+        },
+        rejection => {
+          setData({
+            ...data,
+            progress: new Error(rejection)
+          })
+        }
+      )
     }
   })
   const setter = (value: () => Promise<T>) => {
     setData({
       ...data,
-      progress: Progress.Progressing
+      progress: "progressing"
     })
-    value().then(data => {
-      setData({
-        data,
-        progress: Progress.Normal
-      })
-    })
+    value().then(
+      data => {
+        setData({
+          data,
+          progress: "normal"
+        })
+      },
+      rejection => {
+        setData({
+          ...data,
+          progress: new Error(rejection)
+        })
+      }
+    )
   }
   return [data, setter] as [AsyncData<T | null>, typeof setter]
 }
