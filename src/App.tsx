@@ -18,6 +18,20 @@ function App() {
           Edit <code>src/App.js</code> and save to reload.
         </p>
         {post.data ? JSON.stringify(post.data) : "Loading"}
+        <br></br>
+        <button
+          onClick={() => {
+            setPost(
+              () =>
+                fetch("https://jsonplaceholder.typicode.com/posts/2").then(
+                  response => response.json()
+                ) as Promise<Post>
+            )
+          }}
+        >
+          Btn
+        </button>
+        {post.progress}
         <a
           className="App-link"
           href="https://reactjs.org"
